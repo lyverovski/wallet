@@ -1,0 +1,55 @@
+name: wallet
+
+up:
+  - homebrew:
+    - openssl
+    # - another_package
+  - ruby: 2.3.3
+  - bundler
+  - railgun
+  - database:
+      bootstrap: bin/rails db:create db:migrate db:setup
+      migrate: bin/rails db:migrate db:test:prepare
+      host: wallet.railgun
+      user: root
+      password: ''
+      database: wallet_development
+
+commands:
+  console: bin/rails console
+  server: bin/rails s -p 37529 -b 192.168.64.1
+  test:
+    syntax:
+      argument: file
+      optional: args...
+    run:    bin/rails test
+
+# These use fuzzy-matching, so you can (e.g.) `dev open app`
+open:
+  "My Application": https://wallet.myshopify.io
+
+railgun:
+  image: dev:railgun-common-services-0.2.x
+  services:
+    redis:         6379
+    memcached:    11211
+    # toxiproxy:     8474
+    mysql:         3306
+    # elasticsearch: 9200
+    # zookeeper:     2181
+    # argus:         8001
+    # magellan:      8438
+    # imagery:      25300
+    nginx:           80
+    # kafka:         9092
+  # Each project has a semi-unique VM IP address Shopify's is 192.168.64.2. The host
+  # (your MacBook) is 192.168.64.1.
+  ip_address: 192.168.64.185
+  memory: 2G
+  cores: 2
+  disk: 2G
+  # Hostnames which point into the VM, and are configured to proxy back out.
+  # Generally should be *.myshopify.io, and should point to the same port that
+  # your application starts on.
+  proxy:
+    wallet.myshopify.io: 37529
